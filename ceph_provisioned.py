@@ -78,8 +78,8 @@ for item in output:
         returnee[root_name]["total_used_size"] += item["total_used_size"]
         returnee[root_name]["total_provisioned_size"] += item["total_provisioned_size"]
     else:
-        returnee[root_name]["total_used_size"] = item["total_used_size"]
-        returnee[root_name]["total_provisioned_size"] = item["total_provisioned_size"]
+        returnee[root_name] = {"total_used_size": item["total_used_size"],
+                            "total_provisioned_size": item["total_provisioned_size"]}
 
 from pprint import pprint
 pprint(returnee)
