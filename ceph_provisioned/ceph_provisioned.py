@@ -12,7 +12,7 @@ import configparser
 from pprint import pprint
 
 from pyzabbix import ZabbixMetric, ZabbixSender
-from pyzabbix_socketwrapper import PyZabbixPSKSocetWrapper
+from pyzabbix_socketwrapper import PyZabbixPSKSocketWrapper
 
 
 CONFIG_FILE = "/etc/zabbix-ceph/config.ini"
@@ -162,11 +162,11 @@ def main():
     print("Results that matter for zabbix")
     pprint(root_results)
 
-    for root in root_results:
+    for root, stats in root_results.iteritems():
         KEY = "ceph.custom.root.raw.total.provisioned[" + root + "]"
-        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, root_results["raw_total_provisioned_size"])])
+        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, stats["raw_total_provisioned_size"])])
         KEY = "ceph.custom.root.raw.total.used[" + root + "]"
-        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, root_results["raw_total_used_size"])])
+        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, stats["raw_total_used_size"])])
 
 
 if __name__ == "__main__":
