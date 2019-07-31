@@ -2,6 +2,7 @@
 
 """Calculate provisioned space"""
 
+from __future__ import division
 import sys
 import subprocess
 import json
