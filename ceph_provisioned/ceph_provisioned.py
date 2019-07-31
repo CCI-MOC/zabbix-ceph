@@ -5,8 +5,12 @@
 import sys
 import subprocess
 import json
+import functools
 import multiprocessing
 from pprint import pprint
+
+from pyzabbix import ZabbixMetric, ZabbixSender
+from pyzabbix_socketwrapper import PyZabbixPSKSocetWrapper
 
 
 def execute_command(command):
@@ -122,7 +126,6 @@ def get_pool_crush_rule_map():
 
 def main():
     """main"""
-
     pools = get_pools()
     pool_root_map = get_pool_root_map()
     results = []
