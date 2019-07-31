@@ -126,6 +126,15 @@ def get_pool_crush_rule_map():
 
 def main():
     """main"""
+    PSK_IDENTITY = "READ_IT_FROM_FILE_OR_SOMETHING"
+    ZABBIX_SERVER = "THE_SERVER"
+    HOST_IN_ZABBIX = "THE_CEPH_HOST_IN_ZABBIX"
+
+    custom_wrapper = functools.partial(
+        PyZabbixPSKSocketWrapper, identity=PSK_IDENTITY, psk=bytes(bytearray.fromhex(PSK)))
+    zabbix_sender = ZabbixSender(
+        zabbix_server=ZABBIX_SERVER, socket_wrapper=custom_wrapper)
+
     pools = get_pools()
     pool_root_map = get_pool_root_map()
     results = []
@@ -153,6 +162,13 @@ def main():
 
     print("Results that matter for zabbix")
     pprint(root_results)
+
+    for root in root_results:
+        KEY = "ceph.custom.root.raw.total.provisioned[" + root + "]"
+        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, root_results["raw_total_provisioned_size"])])
+        KEY = "ceph.custom.root.raw.total.used[" + root + "]"
+        zabbix_sender.send([ZabbixMetric(HOST_IN_ZABBIX, KEY, root_results["raw_total_used_size"])])
+
 
 if __name__ == "__main__":
     main()
