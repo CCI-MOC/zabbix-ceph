@@ -8,10 +8,14 @@ import subprocess
 import json
 import functools
 import multiprocessing
+import configparser
 from pprint import pprint
 
 from pyzabbix import ZabbixMetric, ZabbixSender
 from pyzabbix_socketwrapper import PyZabbixPSKSocetWrapper
+
+
+CONFIG_FILE = "/etc/zabbix-ceph/config.ini"
 
 
 def execute_command(command):
@@ -115,21 +119,15 @@ def get_pool_root_map():
     return pool_root_map
 
 
-def get_pool_crush_rule_map():
-    """Returns the pool names and crush rule being used"""
-    command = "ceph osd pool ls detail --format json"
-    jsonout = json.loads(subprocess.check_output(command.split()))
-    pool_crush_rule_map = []
-    for item in jsonout:
-        pool_crush_rule_map.append((item["pool_name"], item["crush_rule"]))
-    return pool_crush_rule_map
-
-
 def main():
     """main"""
-    PSK_IDENTITY = "READ_IT_FROM_FILE_OR_SOMETHING"
-    ZABBIX_SERVER = "THE_SERVER"
-    HOST_IN_ZABBIX = "THE_CEPH_HOST_IN_ZABBIX"
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
+
+    PSK = config['general']['PSK']
+    PSK_IDENTITY = config['general']['PSK_IDENTITY']
+    HOST_IN_ZABBIX = config['general']['HOST_IN_ZABBIX']
+    ZABBIX_SERVER = config['general']['ZABBIX_SERVER']
 
     custom_wrapper = functools.partial(
         PyZabbixPSKSocketWrapper, identity=PSK_IDENTITY, psk=bytes(bytearray.fromhex(PSK)))
